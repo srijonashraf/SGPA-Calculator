@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGPA Calculator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/2065/2065169.png" type="image/x-icon">
     <style>
         body {
             padding: 20px;
@@ -36,6 +35,7 @@
                     <th>Subject</th>
                     <th>Credit</th>
                     <th>CGPA</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="subjectTableBody">
@@ -71,36 +71,79 @@
 
                 subjects.push(subject);
 
-                $("#subjectTableBody").append(`
-          <tr>
-            <td>Subject ${subjects.length}</td>
-            <td>${subject.credit}</td>
-            <td>${subject.cgpa}</td>
-          </tr>
-        `);
-
+                displaySubjects();
                 calculateSGPA();
                 resetForm();
+                focusOnCreditInput();
             });
 
-            // Calculate SGPA
+            // Display subjects in the table
+            function displaySubjects() {
+                $("#subjectTableBody").empty();
+
+                subjects.forEach((subject, index) => {
+                    const subjectNumber = index + 1;
+
+                    $("#subjectTableBody").append(`
+            <tr id="subject${index}">
+              <td>Subject ${subjectNumber}</td>
+              <td>
+                <input type="number" class="form-control subject-credit" value="${subject.credit}" required>
+              </td>
+              <td>
+                <input type="number" step="0.01" class="form-control subject-cgpa" value="${subject.cgpa}" required>
+              </td>
+              <td>
+                <button type="button" class="btn btn-primary btn-edit" data-index="${index}">Edit</button>
+                <button type="button" class="btn btn-danger btn-delete" data-index="${index}">Delete</button>
+              </td>
+            </tr>
+          `);
+                });
+
+                // Attach event listeners to edit and delete buttons
+                $(".btn-edit").click(function () {
+                    const index = $(this).data("index");
+                    const subject = subjects[index];
+                    const subjectRow = $(`#subject${index}`);
+
+                    subject.credit = parseFloat(subjectRow.find(".subject-credit").val());
+                    subject.cgpa = parseFloat(subjectRow.find(".subject-cgpa").val());
+
+                    calculateSGPA();
+                });
+
+                $(".btn-delete").click(function () {
+                    const index = $(this).data("index");
+                    subjects.splice(index, 1);
+                    displaySubjects();
+                    calculateSGPA();
+                });
+            }
+
+            // Calculate SGPA based on the subjects
             function calculateSGPA() {
                 let totalCredits = 0;
-                let weightedSum = 0;
+                let totalGradePoints = 0;
 
                 subjects.forEach(subject => {
                     totalCredits += subject.credit;
-                    weightedSum += subject.credit * subject.cgpa;
+                    totalGradePoints += subject.credit * subject.cgpa;
                 });
 
-                const sgpa = weightedSum / totalCredits;
+                const sgpa = totalGradePoints / totalCredits;
                 $("#sgpaOutput").text(`SGPA: ${sgpa.toFixed(2)}`);
             }
 
-            // Reset the form after adding a subject
+            // Reset the form inputs
             function resetForm() {
                 $("#creditInput").val("");
                 $("#cgpaInput").val("");
+            }
+
+            // Focus on the credit input field
+            function focusOnCreditInput() {
+                $("#creditInput").focus();
             }
         });
     </script>
