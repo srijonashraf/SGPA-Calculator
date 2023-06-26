@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPA Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/2065/2065169.png" type="image/x-icon">
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4">SGPA Calculator</h1>
+
+        <form id="sgpaForm">
+            <div class="form-group">
+                <label for="creditInput">Credit:</label>
+                <input type="number" class="form-control" id="creditInput" placeholder="Enter credit" required>
+            </div>
+            <div class="form-group">
+                <label for="cgpaInput">CGPA:</label>
+                <input type="number" step="0.01" class="form-control" id="cgpaInput" placeholder="Enter CGPA" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Subject</button>
+        </form>
+
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Credit</th>
+                    <th>CGPA</th>
+                </tr>
+            </thead>
+            <tbody id="subjectTableBody">
+            </tbody>
+        </table>
+
+        <h3 id="sgpaOutput" class="mt-4">SGPA: -</h3>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let subjects = [];
+
+            // Add subject to the table and calculate SGPA
+            $("#sgpaForm").submit(function (event) {
+                event.preventDefault();
+
+                const credit = parseFloat($("#creditInput").val());
+                const cgpa = parseFloat($("#cgpaInput").val());
+
+                if (isNaN(credit) || isNaN(cgpa)) {
+                    alert("Please enter valid credit and CGPA values.");
+                    return;
+                }
+
+                const subject = {
+                    credit,
+                    cgpa
+                };
+
+                subjects.push(subject);
+
+                $("#subjectTableBody").append(`
+          <tr>
+            <td>Subject ${subjects.length}</td>
+            <td>${subject.credit}</td>
+            <td>${subject.cgpa}</td>
+          </tr>
+        `);
+
+                calculateSGPA();
+                resetForm();
+            });
+
+            // Calculate SGPA
+            function calculateSGPA() {
+                let totalCredits = 0;
+                let weightedSum = 0;
+
+                subjects.forEach(subject => {
+                    totalCredits += subject.credit;
+                    weightedSum += subject.credit * subject.cgpa;
+                });
+
+                const sgpa = weightedSum / totalCredits;
+                $("#sgpaOutput").text(`SGPA: ${sgpa.toFixed(2)}`);
+            }
+
+            // Reset the form after adding a subject
+            function resetForm() {
+                $("#creditInput").val("");
+                $("#cgpaInput").val("");
+            }
+        });
+    </script>
+</body>
+
+</html>
