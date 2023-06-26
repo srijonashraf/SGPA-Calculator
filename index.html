@@ -6,43 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SGPA Calculator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            padding: 20px;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="mb-4">SGPA Calculator</h1>
-
+    <div class="container mt-5">
+        <h2 class="mb-4">SGPA Calculator</h2>
         <form id="sgpaForm">
-            <div class="form-group">
-                <label for="creditInput">Credit:</label>
-                <input type="number" class="form-control" id="creditInput" placeholder="Enter credit" required>
+            <div class="form-row">
+                <div class="col">
+                    <input type="number" id="creditInput" class="form-control" placeholder="Enter Credit" required>
+                </div>
+                <div class="col">
+                    <input type="text" id="cgpaInput" class="form-control" placeholder="Enter CGPA" required>
+                    <div class="invalid-feedback">Please enter a valid CGPA (0.00, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25,
+                        3.50, 3.75, 4.00).</div>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Add Subject</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="cgpaInput">CGPA:</label>
-                <input type="number" step="0.01" class="form-control" id="cgpaInput" placeholder="Enter CGPA" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Add Subject</button>
         </form>
-
         <table class="table mt-4">
             <thead>
                 <tr>
                     <th>Subject</th>
                     <th>Credit</th>
                     <th>CGPA</th>
-                    <th></th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="subjectTableBody">
             </tbody>
         </table>
-
-        <h3 id="sgpaOutput" class="mt-4">SGPA: -</h3>
+        <div id="sgpaOutput" class="mt-4 font-weight-bold h4 bg-primary text-white"></div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -63,6 +59,13 @@
                     alert("Please enter valid credit and CGPA values.");
                     return;
                 }
+
+                if (![0, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4].includes(cgpa)) {
+                    $("#cgpaInput").addClass("is-invalid");
+                    return;
+                }
+
+                $("#cgpaInput").removeClass("is-invalid");
 
                 const subject = {
                     credit,
@@ -133,6 +136,9 @@
 
                 const sgpa = totalGradePoints / totalCredits;
                 $("#sgpaOutput").text(`SGPA: ${sgpa.toFixed(2)}`);
+                $("#sgpaOutput").css("padding", "10px");
+
+                
             }
 
             // Reset the form inputs
